@@ -53,7 +53,7 @@ title('Hy (TE mode)'); xlabel('x'); ylabel('y');
 end
 
 figure
-plot(vect_neff);
+plot(vect_neff(:,1));
 title("Neff (TE mode)") ;
 
 %% REMOVE TM Mode Calculations
