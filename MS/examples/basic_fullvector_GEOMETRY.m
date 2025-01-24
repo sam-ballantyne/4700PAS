@@ -37,12 +37,12 @@ fprintf(1,'neff = %.6f\n',neffTE);
 
 figure(i);
 subplot(121);
-contourmode(x,y,Hx(:,:,n));
+contourmode(x,y,Hx(:,:,1));
 title('Hx (TE mode)'); xlabel('x'); ylabel('y'); 
 %for v = edges, line(v{:}); end
 
 subplot(122);
-contourmode(x,y,Hy(:,:,n));
+contourmode(x,y,Hy(:,:,1));
 title('Hy (TE mode)'); xlabel('x'); ylabel('y'); 
 %for v = edges, line(v{:}); end
 

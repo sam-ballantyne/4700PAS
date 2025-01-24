@@ -22,7 +22,7 @@ dx = 0.0125;        % grid size (horizontal)
 dy = 0.0125;        % grid size (vertical)
 
 lambda = 1.55;      % vacuum wavelength
-nmodes = 5;         % number of modes to compute
+nmodes = 10;         % number of modes to compute
 
 [x,y,xc,yc,nx,ny,eps,edges] = waveguidemesh([n1,n2,n3],[h1,h2,h3], ...
                                             rh,rw,side,dx,dy); 
