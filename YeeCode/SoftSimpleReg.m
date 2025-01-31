@@ -60,7 +60,7 @@ Plot.off = 0;
 Plot.pl = 0;
 Plot.ori = '13';
 Plot.N = 100;
-Plot.MaxEz = 1.1;
+Plot.MaxEz = 3.5;
 Plot.MaxH = Plot.MaxEz/c_eta_0;
 Plot.pv = [0 0 90];
 Plot.reglim = [0 xMax{1} 0 yMax];
@@ -69,12 +69,20 @@ Plot.reglim = [0 xMax{1} 0 yMax];
 % The bc's are not technically a boundary (misnomer) --> it creates the
 % soft source of the wave at the intersection of the denoted scattering
 % field and the total field
-bc{1}.NumS = 1;
-bc{1}.s(1).xpos = nx{1}/(4) + 1; % source at this position
+
+% Source 1
+bc{1}.NumS = 2;
+bc{1}.s(1).xpos = floor(nx{1}/(10) + 1); % source at this position
 bc{1}.s(1).type = 'ss'; % ss = steady state
 bc{1}.s(1).fct = @PlaneWaveBC; 
+
+% Source 2
+bc{1}.s(2).xpos = floor(nx{1}/(4) + 1); % source at this position
+bc{1}.s(2).type = 'ss'; % ss = steady state
+bc{1}.s(2).fct = @PlaneWaveBC; 
+
+% pass the boundary condition -- this function that creates a pulse
 % mag = -1/c_eta_0;
-% pass the boundary condition this function that creates a pulse
 mag = 1;
 phi = 0;
 omega = f*2*pi;
@@ -85,7 +93,7 @@ s = 0;
 y0 = yMax/2;
 sty = 1.5*lambda;
 bc{1}.s(1).paras = {mag,phi,omega,betap,t0,st,s,y0,sty,'s'};
-
+bc{1}.s(2).paras = {mag,phi,omega,betap,t0,st,s,y0,sty,'s'};
 Plot.y0 = round(y0/dx);
 
 % 'a' = absorbing boundary conditions (PML all around)

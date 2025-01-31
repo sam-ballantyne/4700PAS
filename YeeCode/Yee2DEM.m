@@ -257,12 +257,14 @@ for i = 1:nSteps
 
         if bc{k}.NumS > 0
             
-            Einc = bc{k}.s(1).fct(yC{k},i,t,bc{k}.s(1).paras);
-            Eincp = bc{k}.s(1).fct(yC{k},i,t-ds/c_c/2,bc{k}.s(1).paras);
+            for m = 1:bc{k}.NumS
+            Einc = bc{k}.s(m).fct(yC{k},i,t,bc{k}.s(m).paras);
+            Eincp = bc{k}.s(m).fct(yC{k},i,t-ds/c_c/2,bc{k}.s(m).paras);
             
-            Hy{k}(bc{k}.s(1).xpos,:) = Hy{k}(bc{k}.s(1).xpos,:) + dt/ds/c_mu_0*Einc;
-            Ez{k}(bc{k}.s(1).xpos-1,:) = Ez{k}(bc{k}.s(1).xpos-1,:) - dt/ds/c_eps_0/c_eta_0*Eincp;
+            Hy{k}(bc{k}.s(m).xpos,:) = Hy{k}(bc{k}.s(m).xpos,:) + dt/ds/c_mu_0*Einc;
+            Ez{k}(bc{k}.s(m).xpos-1,:) = Ez{k}(bc{k}.s(m).xpos-1,:) - dt/ds/c_eps_0/c_eta_0*Eincp;
             
+            end
         end
         
         
