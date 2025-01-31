@@ -121,6 +121,9 @@ for k = 1:Reg.n
     QExz{k} = zeros(nx{k}-1,ny{k});
     
     %% coeff
+    % Update coeffs, coded from Computational Electrodynamics(FDTD), Taflove 
+    % The C coeffs update the E-fields of the Yee Grid (Ez)
+    % The D coeffs update the H-fields of the Yee Grid (Hx, Hy)
     Ca{k} = (1 - sigma{k}*dt./(2*epi{k}))./(1 + sigma{k}*dt./(2*epi{k}));
     Cb{k} = (dt./(epi{k}*ds))./(1 + sigma{k}*dt./(2*epi{k}));
     
@@ -155,6 +158,12 @@ end
 Ez_t = zeros(nSteps,ny{1});
 Ez_r = zeros(nSteps,ny{1});
 
+%% Main Loop (loop in time advancing dt)
+% 1. Update H at t+1/2 using previous E's (first iteration from source boundary)
+% 2. Update H BC values (around gratings)
+% 3. Update E's using H's
+% 4. Update E's and H's at soft sources
+
 for i = 1:nSteps
     
     for k = 1:Reg.n
@@ -168,28 +177,30 @@ for i = 1:nSteps
         t = i*dt - dt/2; % n + 1/2 update
         th(i) = t;
         
+        % E-field source progression
         dEzdx{k} = Ez{k}(2:end,:) - Ez{k}(1:end-1,:);
         dEzdy{k} = Ez{k}(:,2:end) - Ez{k}(:,1:end-1);
         
+        % Step 1: Update H's with D-coeffs and previous E's
         Hx{k}(:,2:end-1) = Da{k}(:,1:end-1).*Hx{k}(:,2:end-1) - Db{k}(:,1:end-1).*(dEzdy{k});
         Hy{k}(2:end-1,:) = Da{k}(1:end-1,:).*Hy{k}(2:end-1,:) + Db{k}(1:end-1,:).*(dEzdx{k});
         
         QExz{k} = bxHy{k}(1:end-1,:).*QExz{k} - cxHy{k}(1:end-1,:).*dEzdx{k};
         QEyz{k} = byHx{k}(:,1:end-1).*QEyz{k} - cyHx{k}(:,1:end-1).*dEzdy{k};
-        
+       
         Hx{k}(:,2:end-1) = Hx{k}(:,2:end-1) - dt./mu{k}(:,1:end-1).*QEyz{k};
         Hy{k}(2:end-1,:) = Hy{k}(2:end-1,:) + dt./mu{k}(1:end-1,:).*QExz{k};
         
         
-        % boundary conditions on H
+        % Step 2: boundary conditions on H update
         
-        if bc{k}.ym.type == 's'
+        if bc{k}.ym.type == 's' % H hard source (reflects incoming waves)
             [Hx{k}(:,1), bc{k}.ym.paras] = bc{k}.ym.fct(xC{k},i,t,bc{k}.ym.paras);
-        elseif bc{k}.ym.type == 'e'
+        elseif bc{k}.ym.type == 'e' % explicit metasurface
             Hx{k}(:,1) = Hx{k}(:,2);
-        elseif bc{k}.ym.type == 'm'
+        elseif bc{k}.ym.type == 'm' % magnetic wall (H = 0)
             Hx{k}(:,1) = 0;
-        elseif bc{k}.ym.type == 'p'
+        elseif bc{k}.ym.type == 'p' % periodic
             Hx{k}(:,1) = Da{k}(:,1).*Hx{k}(:,1) - Db{k}(:,1).*(Ez{k}(:,1) - Ez{k}(:,end));
         end
         
@@ -225,7 +236,7 @@ for i = 1:nSteps
             Hy{k}(end,:) = Hy{k}(1,:);
         end
         
-        % Ez update`
+        % Step 3 : Ez update using the C-coeffs (from Taflove)
         t = i*dt; % n + 1 update
         te(i) = t;
         
@@ -240,6 +251,10 @@ for i = 1:nSteps
         
         Ez{k} = Ez{k} - dt./epi{k}.*QHyx{k} + dt./epi{k}.*QHxy{k};
         
+        % Step 4: Soft Sources - can produce electric field and allow
+        % reflective field to come back through them (scattered field
+        % region)
+
         if bc{k}.NumS > 0
             
             Einc = bc{k}.s(1).fct(yC{k},i,t,bc{k}.s(1).paras);
