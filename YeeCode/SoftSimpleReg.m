@@ -71,15 +71,15 @@ Plot.reglim = [0 xMax{1} 0 yMax];
 % field and the total field
 
 % Source 1
-bc{1}.NumS = 2;
+bc{1}.NumS = 1;
 bc{1}.s(1).xpos = floor(nx{1}/(10) + 1); % source at this position
 bc{1}.s(1).type = 'ss'; % ss = steady state
 bc{1}.s(1).fct = @PlaneWaveBC; 
 
 % Source 2
-bc{1}.s(2).xpos = floor(nx{1}/(4) + 1); % source at this position
-bc{1}.s(2).type = 'ss'; % ss = steady state
-bc{1}.s(2).fct = @PlaneWaveBC; 
+%bc{1}.s(2).xpos = floor(nx{1}/(4) + 1); % source at this position
+%bc{1}.s(2).type = 'ss'; % ss = steady state
+%bc{1}.s(2).fct = @PlaneWaveBC; 
 
 % pass the boundary condition -- this function that creates a pulse
 % mag = -1/c_eta_0;
@@ -93,7 +93,7 @@ s = 0;
 y0 = yMax/2;
 sty = 1.5*lambda;
 bc{1}.s(1).paras = {mag,phi,omega,betap,t0,st,s,y0,sty,'s'};
-bc{1}.s(2).paras = {mag,phi,omega,betap,t0,st,s,y0,sty,'s'};
+%bc{1}.s(2).paras = {mag,phi,omega,betap,t0,st,s,y0,sty,'s'};
 Plot.y0 = round(y0/dx);
 
 % 'a' = absorbing boundary conditions (PML all around)
